@@ -1,0 +1,46 @@
+/* src/components/TableRow.css */
+.cell-content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 8vw;
+    height: 2vh;
+    line-height: 2vh;
+    min-height: 1.5vh;
+}
+
+.edit-input {
+    width: 100%;
+    height: 2vh;
+    padding: 0 0.2vw;
+    border: 0.05vw solid #ccc;
+    border-radius: 0.1vw;
+    font-size: 0.625vw;
+    box-sizing: border-box;
+}
+
+.selected-row {
+    background-color: #e0e7ff; /* Светло-синий фон для выделенной строки */
+}
+
+.delete-row {
+    background-color: #f8d7da; /* Светло-красный фон для строки с кнопкой "Удалить" */
+}
+
+.delete-btn {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0.5vh;
+    border: none;
+    background-color: transparent;
+    color: #dc3545; /* Красный цвет текста */
+    font-size: 0.625vw;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.delete-btn:hover {
+    background-color: #f5c6cb; /* Чуть темнее при наведении */
+}

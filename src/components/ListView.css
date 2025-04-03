@@ -1,0 +1,31 @@
+/* src/components/ListView.css */
+.list-view-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    border: 1px solid #ccc; /* Добавляем рамку */
+    border-radius: 4px;
+    max-height: 300px; /* Ограничиваем высоту */
+    overflow-y: auto; /* Добавляем вертикальный скролл-бар */
+}
+
+.list-view {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer; /* Показываем, что элемент кликабельный */
+    transition: background-color 0.2s; /* Плавный переход для hover */
+}
+
+.list-item:hover {
+    background-color: #f5f5f5; /* Эффект при наведении */
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}

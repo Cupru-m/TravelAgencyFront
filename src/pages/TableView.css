@@ -1,0 +1,51 @@
+/* src/pages/TableView.css */
+.table-view-wrapper {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.table-actions {
+    width: 15vw;
+    background-color: #f8f9fa;
+    padding: 1.5vh;
+    border-right: 0.05vw solid #dee2e6;
+}
+
+.table-actions h3 {
+    margin-top: 0;
+    margin-bottom: 1vh;
+    font-size: 1vw;
+}
+
+.action-btn {
+    display: block;
+    width: 100%;
+    padding: 0.5vh;
+    margin-bottom: 0.5vh;
+    border: 0.05vw solid #ccc;
+    border-radius: 0.2vw;
+    background-color: white;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.2s;
+}
+
+.action-btn:hover {
+    background-color: #e9ecef;
+}
+
+.table-content {
+    flex: 1;
+    padding: 1.5vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 70vw;
+    height: 100%; /* Устанавливаем высоту, чтобы компоненты не выходили за пределы */
+    box-sizing: border-box;
+}
+
+.table-content h2 {
+    margin-bottom: 1vh;
+}
