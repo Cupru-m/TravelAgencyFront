@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import TableDisplay from '../components/TableDisplay';
 import SqlQueryInput from '../components/SqlQueryInput';
-import { fetchTableColumns, fetchTableRows } from '../api/api';
+import OptionsList from '../components/OptionsList'; // Импортируем новый компонент
+import {fetchTableColumns, fetchTableRows, TableData} from '../api/api';
 import './TableView.css';
 
 export interface ColumnInfo {
@@ -55,17 +56,16 @@ const TableView: React.FC = () => {
 
         fetchColumnsAndRows();
     }, [tableName]);
-
+    const handleQueryExecute = (tableData: TableData) => {
+        setColumns(tableData.columns); // Обновляем столбцы
+        setRows(tableData.rows.map(normalizeKeys)); // Обновляем строки с нормализацией ключей
+    };
     return (
         <div className="table-view-wrapper">
-            <div className="table-actions">
-                <h3>Операции</h3>
-                <button className="action-btn">Получить все строки</button>
-                <button className="action-btn">Добавить строку</button>
-            </div>
+            <OptionsList onQueryExecute={handleQueryExecute} tableName={tableName || ''} />
             <div className="table-content">
                 <h2>{tableName || 'Название таблицы'}</h2>
-                <TableDisplay rows={rows} columns={columns} />
+                <TableDisplay rows={rows} columns={columns} tableName={tableName} />
                 <SqlQueryInput />
             </div>
         </div>

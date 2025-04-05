@@ -11,6 +11,7 @@ interface ColumnInfo {
 interface TableDisplayProps {
     rows: any[];
     columns: ColumnInfo[];
+    tableName:any;
 }
 
 const TableDisplay: React.FC<TableDisplayProps> = ({ rows, columns }) => {

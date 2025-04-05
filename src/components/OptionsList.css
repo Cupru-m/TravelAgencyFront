@@ -1,0 +1,50 @@
+/* src/components/OptionsList.css */
+.options-list {
+    width: 15vw;
+    background-color: #f8f9fa;
+    padding: 1.5vh;
+    border-right: 0.05vw solid #dee2e6;
+    box-sizing: border-box;
+}
+
+.options-list h3 {
+    margin-top: 0;
+    margin-bottom: 1vh;
+    font-size: 1vw;
+    color: #343a40;
+}
+
+.option-button {
+    margin-bottom: 0.5vh;
+}
+
+.option-button button {
+    display: block;
+    width: 100%;
+    padding: 0.6vh 0.8vw;
+    border: none;
+    border-radius: 0.3vw;
+    background-color: #007bff; /* Синий фон */
+    color: white; /* Белый текст */
+    cursor: pointer;
+    text-align: center;
+    font-size: 0.625vw;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.option-button button:hover {
+    background-color: #0056b3; /* Темнее при наведении */
+    transform: translateY(-1px); /* Лёгкий подъём */
+}
+
+.option-button button:active {
+    background-color: #004085; /* Ещё темнее при нажатии */
+    transform: translateY(0); /* Возврат на место */
+}
+
+.option-divider {
+    border: none;
+    border-top: 0.05vw solid #dee2e6;
+    margin: 0.5vh 0;
+}

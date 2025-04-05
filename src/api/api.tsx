@@ -8,6 +8,14 @@ interface DatabaseInfo {
     dbName: string;
     tables: string[];
 }
+export interface SqlOption {
+    name: string;
+    query: string;
+}
+export interface TableData {
+    columns: ColumnInfo[];
+    rows: any[];
+}
 
 // Базовый URL для API (можно изменить, если бэкенд работает на другом домене/порту)
 const BASE_URL = '';
@@ -23,7 +31,7 @@ export const fetchDatabaseInfo = async (): Promise<DatabaseInfo> => {
 
 // Получение столбцов для указанной таблицы
 export const fetchTableColumns = async (tableName: string): Promise<ColumnInfo[]> => {
-    const response = await fetch(`${BASE_URL}/api/tables/${tableName.toLowerCase()}/columns`);
+    const response = await fetch(`${BASE_URL}/api/${tableName.toLowerCase()}/columns`);
     if (!response.ok) {
         throw new Error(`Ошибка при загрузке столбцов для таблицы ${tableName}`);
     }
@@ -36,5 +44,28 @@ export const fetchTableRows = async (tableName: string): Promise<any[]> => {
     if (!response.ok) {
         throw new Error(`Ошибка при загрузке строк для таблицы ${tableName}`);
     }
+    return response.json();
+};
+export const fetchSqlOptions = async (): Promise<SqlOption[]> => {
+    const response = await fetch('/api/sql-options');
+    if (!response.ok) {
+        throw new Error('Ошибка при загрузке SQL-запросов');
+    }
+    return response.json();
+};
+// Новая функция для выполнения SQL-запроса
+export const executeSqlQuery = async (sqlQuery: string, tableName: string): Promise<TableData> => {
+    const response = await fetch('/api/execute-sql', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: sqlQuery, tableName }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Ошибка при выполнении SQL-запроса');
+    }
+
     return response.json();
 };

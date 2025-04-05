@@ -20,21 +20,24 @@
 }
 
 .selected-row {
-    background-color: #e0e7ff; /* Светло-синий фон для выделенной строки */
+    background-color: #e0e7ff;
 }
 
 .delete-row {
-    background-color: #f8d7da; /* Светло-красный фон для строки с кнопкой "Удалить" */
+    background-color: #f8d7da;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5vw; /* Отступ между кнопками */
 }
 
 .delete-btn {
-    display: block;
-    width: 100%;
-    height: 100%;
+    flex: 1; /* Кнопки занимают равное пространство */
     padding: 0.5vh;
     border: none;
     background-color: transparent;
-    color: #dc3545; /* Красный цвет текста */
+    color: #dc3545;
     font-size: 0.625vw;
     text-align: center;
     cursor: pointer;
@@ -42,5 +45,21 @@
 }
 
 .delete-btn:hover {
-    background-color: #f5c6cb; /* Чуть темнее при наведении */
+    background-color: #f5c6cb;
+}
+
+.update-btn {
+    flex: 1;
+    padding: 0.5vh;
+    border: none;
+    background-color: transparent;
+    color: #007bff; /* Светло-синий цвет текста */
+    font-size: 0.625vw;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.update-btn:hover {
+    background-color: #cce5ff; /* Чуть темнее светло-синий при наведении */
 }
