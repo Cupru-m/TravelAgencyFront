@@ -38,3 +38,20 @@
     background-color: #f9f9f9;
     cursor: pointer;
 }
+.notification {
+    padding: 0.5vh 1vw;
+    margin-bottom: 1vh;
+    border-radius: 0.3vw;
+    font-size: 0.625vw;
+    text-align: center;
+}
+
+.notification.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.notification.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}

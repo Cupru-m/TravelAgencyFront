@@ -1,7 +1,8 @@
 // src/components/TableDisplay.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import TableRow from './TableRow';
 import './TableDisplay.css';
+import {deleteRow, updateRow} from "../api/api";
 
 interface ColumnInfo {
     name: string;
@@ -11,18 +12,73 @@ interface ColumnInfo {
 interface TableDisplayProps {
     rows: any[];
     columns: ColumnInfo[];
-    tableName:any;
+    tableName: any; // Исправляем тип tableName на string
 }
 
-const TableDisplay: React.FC<TableDisplayProps> = ({ rows, columns }) => {
-    const handleUpdateRow = (updatedRow: any) => {
-        // Здесь можно добавить запрос на сервер для обновления строки
-        console.log('Updated row:', updatedRow);
-        // Для примера просто логируем, в реальном приложении нужно обновить состояние
-    };
+interface Notification {
+    message: string;
+    type: 'success' | 'error';
+}
 
+const TableDisplay: React.FC<TableDisplayProps> = ({ rows: initialRows, columns, tableName }) => {
+    const [rows, setRows] = useState<any[]>(initialRows);
+    const [notification, setNotification] = useState<Notification | null>(null);
+
+    // Обновляем состояние строк, если изменились входные данные (например, после выполнения SQL-запроса)
+    React.useEffect(() => {
+        setRows(initialRows);
+    }, [initialRows]);
+
+    const handleUpdateRow = async (updatedRow: any) => {
+        try {
+            await updateRow(tableName, updatedRow.id, updatedRow);
+
+            // Обновляем локальное состояние строк
+            const updatedRows = rows.map((row) =>
+                row.id === updatedRow.id ? updatedRow : row
+            );
+            setRows(updatedRows);
+            setNotification({ message: 'Операция произведена успешно', type: 'success' });
+
+            // Убираем уведомление через 3 секунды
+            setTimeout(() => setNotification(null), 3000);
+        } catch (error) {
+            console.error('Ошибка при обновлении строки:', error);
+            setNotification({ message: 'Не удалось произвести операцию', type: 'error' });
+
+            // Убираем уведомление через 3 секунды
+            setTimeout(() => setNotification(null), 3000);
+        }
+    };
+    React.useEffect(() => {
+        setRows(initialRows);
+    }, [initialRows]);
+    const handleDeleteRow = async (id: string) => {
+        try {
+            await deleteRow(tableName, id);
+
+            // Удаляем строку из локального состояния
+            const updatedRows = rows.filter((row) => row.id !== id);
+            setRows(updatedRows);
+            setNotification({ message: 'Строка успешно удалена', type: 'success' });
+
+            // Убираем уведомление через 3 секунды
+            setTimeout(() => setNotification(null), 3000);
+        } catch (error) {
+            console.error('Ошибка при удалении строки:', error);
+            setNotification({ message: 'Не удалось удалить строку', type: 'error' });
+
+            // Убираем уведомление через 3 секунды
+            setTimeout(() => setNotification(null), 3000);
+        }
+    };
     return (
         <div className="table-display-container">
+            {notification && (
+                <div className={`notification ${notification.type}`}>
+                    {notification.message}
+                </div>
+            )}
             <table className="table-display">
                 <thead>
                 <tr>
@@ -41,10 +97,11 @@ const TableDisplay: React.FC<TableDisplayProps> = ({ rows, columns }) => {
                 {rows.length > 0 ? (
                     rows.map((row, rowIndex) => (
                         <TableRow
-                            key={rowIndex}
+                            key={row.id || rowIndex}
                             row={row}
                             columns={columns}
                             onUpdate={handleUpdateRow}
+                            onDelete={handleDeleteRow}
                         />
                     ))
                 ) : (

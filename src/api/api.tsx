@@ -1,4 +1,6 @@
 // src/api.ts
+import {normalizeKeysToCamelCase} from "../utils/utils";
+
 interface ColumnInfo {
     name: string;
     type: string;
@@ -68,4 +70,31 @@ export const executeSqlQuery = async (sqlQuery: string, tableName: string): Prom
     }
 
     return response.json();
+};
+
+export const updateRow = async (tableName: string, id: string, updatedRow: any): Promise<void> => {
+    updatedRow = normalizeKeysToCamelCase(updatedRow);
+    const response = await fetch(`/api/${tableName}/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedRow),
+    });
+
+    if (!response.ok) {
+        throw new Error('Не удалось обновить строку');
+    }
+};
+export const deleteRow = async (tableName: string, id: string): Promise<void> => {
+    const response = await fetch(`/api/${tableName}/${id}`, {
+        method: 'DELETE', // Исправляем метод на DELETE
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Не удалось удалить строку');
+    }
 };

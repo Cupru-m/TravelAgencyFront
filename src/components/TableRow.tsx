@@ -6,9 +6,11 @@ interface TableRowProps {
     row: any;
     columns: { name: string; type: string }[];
     onUpdate: (updatedRow: any) => void;
+    onDelete: (id: string) => void; // Добавляем пропс для удаления
 }
 
-const TableRow: React.FC<TableRowProps> = ({ row, columns, onUpdate }) => {
+
+const TableRow: React.FC<TableRowProps> = ({ row, columns, onUpdate,onDelete }) => {
     const [editingCell, setEditingCell] = useState<string | null>(null);
     const [editValue, setEditValue] = useState<string>('');
     const [isSelected, setIsSelected] = useState<boolean>(false);
@@ -38,6 +40,10 @@ const TableRow: React.FC<TableRowProps> = ({ row, columns, onUpdate }) => {
         if (e.key === 'Enter') {
             handleBlur(columnName);
         }
+    };
+    const handleDelete = () => {
+        onDelete(row.id); // Вызываем onDelete с id строки
+        setIsSelected(false);
     };
 
     const formatValue = (value: any): string => {
@@ -93,7 +99,7 @@ const TableRow: React.FC<TableRowProps> = ({ row, columns, onUpdate }) => {
                 <tr className="delete-row">
                     <td colSpan={columns.length}>
                         <div className="action-buttons">
-                            <button className="delete-btn">Удалить</button>
+                            <button className="delete-btn" onClick={handleDelete}>Удалить</button>
                             <button className="update-btn" onClick={handleUpdate}>
                                 Изменить
                             </button>
