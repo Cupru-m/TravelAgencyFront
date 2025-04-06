@@ -1,0 +1,64 @@
+.table-display-container {
+    width: 100%;
+    max-width: 70vw;
+    margin: 0 auto;
+    border: 0.05vw solid #ccc;
+    border-radius: 0.2vw;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.table-display {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-display th,
+.table-display td {
+    padding: 0.4vw;
+    border-bottom: 0.05vw solid #eee;
+    text-align: left;
+    font-size: 0.8vw;
+    min-width: 8vw;
+}
+
+.table-display th {
+    background-color: #f5f5f5;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table-display tr:last-child td {
+    border-bottom: none;
+}
+
+.table-display tbody tr:hover {
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+.table-display-container h2 {
+    margin: 0 0 1vh;
+    font-size: 1.25vw; /* Устанавливаем размер шрифта для заголовка */
+    color: #333;
+    text-align: center;
+}
+
+.notification {
+    padding: 0.5vh 1vw;
+    margin-bottom: 1vh;
+    border-radius: 0.3vw;
+    font-size: 0.625vw;
+    text-align: center;
+}
+
+.notification.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.notification.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}

@@ -1,5 +1,6 @@
+// src/components/SqlQueryInput.tsx
 import React, { useState } from 'react';
-import { saveSqlTemplate } from '../api/api';
+import { saveSqlTemplate, executeSqlQuerySimple } from '../api/api';
 import './SqlQueryInput.css';
 
 interface Notification {
@@ -8,18 +9,21 @@ interface Notification {
 }
 
 interface SqlQueryInputProps {
-    onTemplateSaved: () => void; // Новый пропс для уведомления о сохранении
+    onTemplateSaved: () => void;
+    onQueryResult: (result: { columns: { name: string; type: string }[]; rows: any[] }) => void;
+    onShowResult: (show: boolean) => void;
 }
 
-const SqlQueryInput: React.FC<SqlQueryInputProps> = ({ onTemplateSaved }) => {
-    const [query, setQuery] = useState<string>(''); // Состояние для SQL-запроса
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // Состояние для модального окна
-    const [templateName, setTemplateName] = useState<string>(''); // Состояние для названия шаблона
-    const [error, setError] = useState<string>(''); // Состояние для ошибок в модальном окне
-    const [notification, setNotification] = useState<Notification | null>(null); // Состояние для уведомлений
+const SqlQueryInput: React.FC<SqlQueryInputProps> = ({ onTemplateSaved, onQueryResult, onShowResult }) => {
+    const [query, setQuery] = useState<string>('');
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [templateName, setTemplateName] = useState<string>('');
+    const [error, setError] = useState<string>('');
+    const [notification, setNotification] = useState<Notification | null>(null);
 
     const handleQueryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setQuery(e.target.value);
+        setError('');
     };
 
     const handleAddTemplate = () => {
@@ -28,7 +32,7 @@ const SqlQueryInput: React.FC<SqlQueryInputProps> = ({ onTemplateSaved }) => {
             return;
         }
         setError('');
-        setIsModalOpen(true); // Открываем модальное окно
+        setIsModalOpen(true);
     };
 
     const handleSaveTemplate = async () => {
@@ -39,18 +43,40 @@ const SqlQueryInput: React.FC<SqlQueryInputProps> = ({ onTemplateSaved }) => {
 
         try {
             await saveSqlTemplate({ name: templateName, query });
-            setQuery(''); // Очищаем поле ввода
-            setTemplateName(''); // Очищаем название
-            setIsModalOpen(false); // Закрываем модальное окно
+            setQuery('');
+            setTemplateName('');
+            setIsModalOpen(false);
             setError('');
             setNotification({ message: 'Шаблон успешно сохранён', type: 'success' });
             setTimeout(() => setNotification(null), 3000);
-            onTemplateSaved(); // Уведомляем родительский компонент
+            onTemplateSaved();
         } catch (err) {
             setError('');
-            setIsModalOpen(false); // Закрываем модальное окно даже при ошибке
+            setIsModalOpen(false);
             setNotification({ message: 'Ошибка при сохранении шаблона', type: 'error' });
             setTimeout(() => setNotification(null), 3000);
+        }
+    };
+
+    const handleExecuteQuery = async () => {
+        if (!query.trim()) {
+            setError('SQL-запрос не может быть пустым');
+            return;
+        }
+
+        try {
+            const result = await executeSqlQuerySimple(query);
+            onQueryResult(result);
+            onShowResult(true);
+            setError('');
+            setNotification({ message: 'Запрос успешно выполнен', type: 'success' });
+            setTimeout(() => setNotification(null), 3000);
+        } catch (err) {
+            console.error('Ошибка при выполнении SQL-запроса:', err);
+            setError('Не удалось выполнить SQL-запрос');
+            setNotification({ message: 'Ошибка при выполнении запроса', type: 'error' });
+            setTimeout(() => setNotification(null), 3000);
+            onShowResult(false);
         }
     };
 
@@ -79,7 +105,9 @@ const SqlQueryInput: React.FC<SqlQueryInputProps> = ({ onTemplateSaved }) => {
                 <button className="sql-template-btn" onClick={handleAddTemplate}>
                     Добавить SQL шаблон
                 </button>
-                <button className="sql-execute-btn">Выполнить запрос</button>
+                <button className="sql-execute-btn" onClick={handleExecuteQuery}>
+                    Выполнить запрос
+                </button>
             </div>
 
             {isModalOpen && (

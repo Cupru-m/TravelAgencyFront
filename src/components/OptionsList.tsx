@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { fetchDatabaseInfo, fetchSqlTemplates, SqlTemplate } from '../api/api';
+import {executeSqlTemplate, fetchDatabaseInfo, fetchSqlTemplates, SqlTemplate, TableData} from '../api/api';
 import './OptionsList.css';
 
 interface OptionsListProps {
-    onQueryExecute: (tableData: any) => void;
+    onQueryExecute: (tableData: TableData) => void;
     tableName: string;
     onTableSelect: (tableName: string) => void;
-    refreshTemplates: number; // Новый пропс для отслеживания необходимости обновления
+    refreshTemplates: number;
 }
 
 interface TreeItem {
@@ -48,7 +48,7 @@ const OptionsList: React.FC<OptionsListProps> = ({ tableName, onQueryExecute, on
     };
 
     useEffect(() => {
-        loadData(); // Загружаем данные при монтировании и при изменении refreshTemplates
+        loadData();
     }, [refreshTemplates]);
 
     const startResizing = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -62,7 +62,6 @@ const OptionsList: React.FC<OptionsListProps> = ({ tableName, onQueryExecute, on
 
     const resize = (e: MouseEvent) => {
         if (isResizing.current && optionsListRef.current) {
-            const containerWidth = optionsListRef.current.parentElement?.getBoundingClientRect().width || window.innerWidth;
             const newWidthPx = e.clientX - optionsListRef.current.getBoundingClientRect().left;
             const newWidthVw = (newWidthPx / window.innerWidth) * 100;
             if (newWidthVw >= 10 && newWidthVw <= 30) {
@@ -87,9 +86,16 @@ const OptionsList: React.FC<OptionsListProps> = ({ tableName, onQueryExecute, on
         }));
     };
 
-    const handleTableClick = (child: string, parent: string) => {
+    const handleItemClick = async (child: string, parent: string) => {
         if (parent === 'Таблицы') {
             onTableSelect(child);
+        } else if (parent === 'SQL шаблоны') {
+            try {
+                const tableData = await executeSqlTemplate(child, tableName);
+                onQueryExecute(tableData); // Передаём результат запроса в TableView
+            } catch (error) {
+                console.error('Ошибка при выполнении SQL-шаблона:', error);
+            }
         }
     };
 
@@ -119,7 +125,7 @@ const OptionsList: React.FC<OptionsListProps> = ({ tableName, onQueryExecute, on
                                         <li
                                             key={child}
                                             className={`tree-child-item ${child === tableName && item.name === 'Таблицы' ? 'selected' : ''}`}
-                                            onClick={() => handleTableClick(child, item.name)}
+                                            onClick={() => handleItemClick(child, item.name)}
                                         >
                                             {child}
                                         </li>

@@ -21,6 +21,22 @@ export interface TableData {
 }
 
 const BASE_URL = '';
+export const executeSqlTemplate = async (templateName: string, tableName: string): Promise<TableData> => {
+    const response = await fetch('/api/execute-sql-template', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ templateName, tableName }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Ошибка при выполнении SQL-шаблона');
+    }
+
+    return response.json();
+};
+
 export const addRow = async (tableName: string, rowData: any): Promise<void> => {
     rowData = normalizeKeysToCamelCase(rowData);
     const response = await fetch(`/api/${tableName.toLowerCase()}`, {
@@ -109,4 +125,34 @@ export const deleteRow = async (tableName: string, id: string): Promise<void> =>
     if (!response.ok) {
         throw new Error('Не удалось удалить строку');
     }
+};
+export const executeSqlQuery = async (sqlQuery: string, tableName: string): Promise<TableData> => {
+    const response = await fetch('/api/execute-sql', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: sqlQuery, tableName }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Ошибка при выполнении SQL-запроса');
+    }
+
+    return response.json();
+};
+export const executeSqlQuerySimple = async (sqlQuery: string): Promise<TableData> => {
+    const response = await fetch('/api/execute-sql-simple', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: sqlQuery }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Ошибка при выполнении SQL-запроса');
+    }
+
+    return response.json();
 };
