@@ -5,6 +5,7 @@ import SqlQueryInput from '../components/SqlQueryInput';
 import OptionsList from '../components/OptionsList';
 import { fetchTableColumns, fetchTableRows, TableData } from '../api/api';
 import './TableView.css';
+import {normalizeKeys} from "../utils/utils";
 
 export interface ColumnInfo {
     name: string;
@@ -15,16 +16,7 @@ const toSnakeCase = (str: string): string => {
     return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 };
 
-const normalizeKeys = (obj: any): any => {
-    const newObj: any = {};
-    for (const key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            const snakeKey = toSnakeCase(key);
-            newObj[snakeKey] = obj[key];
-        }
-    }
-    return newObj;
-};
+
 
 const TableView: React.FC = () => {
     const { tableName: initialTableName } = useParams<{ tableName: string }>();

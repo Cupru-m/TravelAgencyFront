@@ -6,6 +6,16 @@ const toSnakeCase = (str: string): string => {
 const toCamelCase = (str: string): string => {
     return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
 };
+const normalizeKeys = (obj: any): any => {
+    const newObj: any = {};
+    for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const snakeKey = toSnakeCase(key);
+            newObj[snakeKey] = obj[key];
+        }
+    }
+    return newObj;
+};
 // Преобразует ключи объекта из camelCase в snake_case (например, clientId → client_id)
 const normalizeKeysToSnakeCase = (obj: any): any => {
     const newObj: any = {};
@@ -29,4 +39,4 @@ const normalizeKeysToCamelCase = (obj: any): any => {
     }
     return newObj;
 };
-export {normalizeKeysToCamelCase,normalizeKeysToSnakeCase}
+export {normalizeKeysToCamelCase,normalizeKeysToSnakeCase,normalizeKeys}

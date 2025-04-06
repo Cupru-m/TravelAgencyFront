@@ -21,6 +21,20 @@ export interface TableData {
 }
 
 const BASE_URL = '';
+export const addRow = async (tableName: string, rowData: any): Promise<void> => {
+    rowData = normalizeKeysToCamelCase(rowData);
+    const response = await fetch(`/api/${tableName.toLowerCase()}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(rowData),
+    });
+
+    if (!response.ok) {
+        throw new Error('Не удалось добавить строку');
+    }
+};
 
 export const fetchDatabaseInfo = async (): Promise<DatabaseInfo> => {
     const response = await fetch(`${BASE_URL}/api/database-info`);
@@ -54,21 +68,6 @@ export const fetchSqlTemplates = async (): Promise<SqlTemplate[]> => { // Пер
     return response.json();
 };
 
-export const executeSqlQuery = async (sqlQuery: string, tableName: string): Promise<TableData> => {
-    const response = await fetch('/api/execute-sql', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query: sqlQuery, tableName }),
-    });
-
-    if (!response.ok) {
-        throw new Error('Ошибка при выполнении SQL-запроса');
-    }
-
-    return response.json();
-};
 
 export const saveSqlTemplate = async (template: SqlTemplate): Promise<void> => { // Новая функция для сохранения шаблона
     const response = await fetch('/api/sql-options', {
