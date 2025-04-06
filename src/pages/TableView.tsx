@@ -1,10 +1,9 @@
-// src/pages/TableView.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import TableDisplay from '../components/TableDisplay';
 import SqlQueryInput from '../components/SqlQueryInput';
-import OptionsList from '../components/OptionsList'; // Импортируем новый компонент
-import {fetchTableColumns, fetchTableRows, TableData} from '../api/api';
+import OptionsList from '../components/OptionsList';
+import { fetchTableColumns, fetchTableRows, TableData } from '../api/api';
 import './TableView.css';
 
 export interface ColumnInfo {
@@ -28,45 +27,60 @@ const normalizeKeys = (obj: any): any => {
 };
 
 const TableView: React.FC = () => {
-    const { tableName } = useParams<{ tableName: string }>();
+    const { tableName: initialTableName } = useParams<{ tableName: string }>();
+    const [tableName, setTableName] = useState<string>(initialTableName || '');
     const [columns, setColumns] = useState<ColumnInfo[]>([]);
     const [rows, setRows] = useState<any[]>([]);
+    const [refreshTemplates, setRefreshTemplates] = useState<number>(0); // Счётчик для перезагрузки шаблонов
+
+    const fetchTableData = async (name: string) => {
+        try {
+            if (!name) {
+                throw new Error('Table name is not provided');
+            }
+
+            const columnsData = await fetchTableColumns(name);
+            setColumns(columnsData);
+
+            const rowsData = await fetchTableRows(name);
+            const normalizedRows = rowsData.map(normalizeKeys);
+            setRows(normalizedRows);
+        } catch (error) {
+            console.error('Ошибка:', error);
+            setColumns([]);
+            setRows([]);
+        }
+    };
 
     useEffect(() => {
-        const fetchColumnsAndRows = async () => {
-            try {
-                if (!tableName) {
-                    throw new Error('Table name is not provided');
-                }
-
-                const columnsData = await fetchTableColumns(tableName);
-                console.log(`Columns for ${tableName}:`, columnsData);
-                setColumns(columnsData);
-
-                const rowsData = await fetchTableRows(tableName);
-                const normalizedRows = rowsData.map(normalizeKeys);
-                console.log(`Normalized rows for ${tableName}:`, normalizedRows);
-                setRows(normalizedRows);
-            } catch (error) {
-                console.error('Ошибка:', error);
-                setColumns([]);
-                setRows([]);
-            }
-        };
-
-        fetchColumnsAndRows();
+        fetchTableData(tableName);
     }, [tableName]);
+
     const handleQueryExecute = (tableData: TableData) => {
-        setColumns(tableData.columns); // Обновляем столбцы
-        setRows(tableData.rows.map(normalizeKeys)); // Обновляем строки с нормализацией ключей
+        setColumns(tableData.columns);
+        setRows(tableData.rows.map(normalizeKeys));
     };
+
+    const handleTableSelect = (selectedTableName: string) => {
+        setTableName(selectedTableName);
+    };
+
+    const handleTemplateSaved = () => {
+        setRefreshTemplates((prev) => prev + 1); // Увеличиваем счётчик для перезагрузки шаблонов
+    };
+
     return (
         <div className="table-view-wrapper">
-            <OptionsList onQueryExecute={handleQueryExecute} tableName={tableName || ''} />
+            <OptionsList
+                onQueryExecute={handleQueryExecute}
+                tableName={tableName}
+                onTableSelect={handleTableSelect}
+                refreshTemplates={refreshTemplates} // Передаём счётчик для перезагрузки
+            />
             <div className="table-content">
                 <h2>{tableName || 'Название таблицы'}</h2>
                 <TableDisplay rows={rows} columns={columns} tableName={tableName} />
-                <SqlQueryInput />
+                <SqlQueryInput onTemplateSaved={handleTemplateSaved} /> {/* Передаём callback */}
             </div>
         </div>
     );

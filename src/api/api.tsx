@@ -1,5 +1,4 @@
-// src/api.ts
-import {normalizeKeysToCamelCase} from "../utils/utils";
+import { normalizeKeysToCamelCase } from "../utils/utils";
 
 interface ColumnInfo {
     name: string;
@@ -10,19 +9,19 @@ interface DatabaseInfo {
     dbName: string;
     tables: string[];
 }
-export interface SqlOption {
+
+export interface SqlTemplate { // Переименован SqlOption в SqlTemplate
     name: string;
     query: string;
 }
+
 export interface TableData {
     columns: ColumnInfo[];
     rows: any[];
 }
 
-// Базовый URL для API (можно изменить, если бэкенд работает на другом домене/порту)
 const BASE_URL = '';
 
-// Получение информации о базе данных (название и список таблиц)
 export const fetchDatabaseInfo = async (): Promise<DatabaseInfo> => {
     const response = await fetch(`${BASE_URL}/api/database-info`);
     if (!response.ok) {
@@ -31,7 +30,6 @@ export const fetchDatabaseInfo = async (): Promise<DatabaseInfo> => {
     return response.json();
 };
 
-// Получение столбцов для указанной таблицы
 export const fetchTableColumns = async (tableName: string): Promise<ColumnInfo[]> => {
     const response = await fetch(`${BASE_URL}/api/${tableName.toLowerCase()}/columns`);
     if (!response.ok) {
@@ -40,22 +38,22 @@ export const fetchTableColumns = async (tableName: string): Promise<ColumnInfo[]
     return response.json();
 };
 
-// Получение строк для указанной таблицы
 export const fetchTableRows = async (tableName: string): Promise<any[]> => {
-    const response = await fetch(`${BASE_URL}/api/${tableName.toLowerCase()}`); // Например, /api/clients, /api/bookings
+    const response = await fetch(`${BASE_URL}/api/${tableName.toLowerCase()}`);
     if (!response.ok) {
         throw new Error(`Ошибка при загрузке строк для таблицы ${tableName}`);
     }
     return response.json();
 };
-export const fetchSqlOptions = async (): Promise<SqlOption[]> => {
+
+export const fetchSqlTemplates = async (): Promise<SqlTemplate[]> => { // Переименован fetchSqlOptions
     const response = await fetch('/api/sql-options');
     if (!response.ok) {
         throw new Error('Ошибка при загрузке SQL-запросов');
     }
     return response.json();
 };
-// Новая функция для выполнения SQL-запроса
+
 export const executeSqlQuery = async (sqlQuery: string, tableName: string): Promise<TableData> => {
     const response = await fetch('/api/execute-sql', {
         method: 'POST',
@@ -72,6 +70,20 @@ export const executeSqlQuery = async (sqlQuery: string, tableName: string): Prom
     return response.json();
 };
 
+export const saveSqlTemplate = async (template: SqlTemplate): Promise<void> => { // Новая функция для сохранения шаблона
+    const response = await fetch('/api/sql-options', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(template),
+    });
+
+    if (!response.ok) {
+        throw new Error('Ошибка при сохранении SQL-шаблона');
+    }
+};
+
 export const updateRow = async (tableName: string, id: string, updatedRow: any): Promise<void> => {
     updatedRow = normalizeKeysToCamelCase(updatedRow);
     const response = await fetch(`/api/${tableName}/${id}`, {
@@ -86,9 +98,10 @@ export const updateRow = async (tableName: string, id: string, updatedRow: any):
         throw new Error('Не удалось обновить строку');
     }
 };
+
 export const deleteRow = async (tableName: string, id: string): Promise<void> => {
     const response = await fetch(`/api/${tableName}/${id}`, {
-        method: 'DELETE', // Исправляем метод на DELETE
+        method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
         },

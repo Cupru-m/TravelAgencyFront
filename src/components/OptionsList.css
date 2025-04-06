@@ -1,50 +1,90 @@
-/* src/components/OptionsList.css */
 .options-list {
-    width: 15vw;
     background-color: #f8f9fa;
     padding: 1.5vh;
     border-right: 0.05vw solid #dee2e6;
     box-sizing: border-box;
+    position: relative;
 }
 
 .options-list h3 {
     margin-top: 0;
     margin-bottom: 1vh;
-    font-size: 1vw;
+    font-size: 1.25vw;
     color: #343a40;
 }
 
-.option-button {
+.tree-view {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tree-item {
     margin-bottom: 0.5vh;
 }
 
-.option-button button {
-    display: block;
-    width: 100%;
+.tree-item-header {
+    display: flex;
+    align-items: center;
     padding: 0.6vh 0.8vw;
-    border: none;
+    background-color: #007bff;
+    color: white;
     border-radius: 0.3vw;
-    background-color: #007bff; /* Синий фон */
-    color: white; /* Белый текст */
     cursor: pointer;
-    text-align: center;
-    font-size: 0.625vw;
+    font-size: 0.875vw;
     font-weight: 500;
-    transition: background-color 0.2s ease, transform 0.1s ease;
+    transition: background-color 0.2s ease;
 }
 
-.option-button button:hover {
-    background-color: #0056b3; /* Темнее при наведении */
-    transform: translateY(-1px); /* Лёгкий подъём */
+.tree-item-header:hover {
+    background-color: #0056b3;
 }
 
-.option-button button:active {
-    background-color: #004085; /* Ещё темнее при нажатии */
-    transform: translateY(0); /* Возврат на место */
+.tree-toggle {
+    margin-right: 0.5vw;
+    font-size: 0.875vw;
+    width: 1vw;
+    text-align: center;
 }
 
-.option-divider {
-    border: none;
-    border-top: 0.05vw solid #dee2e6;
-    margin: 0.5vh 0;
+.tree-children {
+    list-style: none;
+    padding-left: 1.5vw;
+    margin: 0.2vh 0 0 0;
+}
+
+.tree-child-item {
+    padding: 0.4vh 0.8vw;
+    background-color: #fff;
+    border: 0.05vw solid #dee2e6;
+    border-radius: 0.2vw;
+    font-size: 0.875vw;
+    color: #343a40;
+    transition: background-color 0.2s ease;
+    cursor: pointer; /* Добавляем указатель, что элемент кликабелен */
+}
+
+.tree-child-item:hover {
+    background-color: #e9ecef;
+}
+
+.tree-child-item.selected {
+    background-color: #cce5ff; /* Светло-синий фон для выбранной таблицы */
+    color: #007bff;
+    font-weight: bold;
+}
+
+.resize-handle {
+    position: absolute;
+    top: 0;
+    right: -0.25vw;
+    width: 0.5vw;
+    height: 100%;
+    background-color: #dee2e6;
+    cursor: ew-resize;
+    transition: background-color 0.2s ease;
+}
+
+.resize-handle:hover {
+    background-color: #adb5bd;
 }
