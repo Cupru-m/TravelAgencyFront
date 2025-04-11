@@ -1,0 +1,141 @@
+/* src/components/AddTableForm.css */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 2vh 2vw;
+    border-radius: 0.3vw;
+    box-shadow: 0 0.2vw 0.5vw rgba(0, 0, 0, 0.3);
+    width: 30vw;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-content h4 {
+    margin: 0 0 1vh;
+    font-size: 1vw;
+    color: #333;
+}
+
+.notification {
+    padding: 0.5vh 1vw;
+    margin-bottom: 1vh;
+    border-radius: 0.3vw;
+    font-size: 0.75vw;
+    text-align: center;
+}
+
+.notification.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.notification.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.modal-field {
+    margin-bottom: 1vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-field label {
+    display: block;
+    font-size: 0.75vw;
+    color: #333;
+    margin-bottom: 0.25vh;
+}
+
+.modal-field input {
+    width: 100%;
+    padding: 0.5vh 0.5vw;
+    border: 0.05vw solid #ccc;
+    border-radius: 0.2vw;
+    font-size: 0.75vw;
+    box-sizing: border-box;
+}
+
+.column-inputs {
+    display: flex;
+    gap: 0.5vw;
+    align-items: center;
+}
+
+.column-inputs input {
+    flex: 1;
+}
+
+.column-inputs select {
+    flex: 1;
+    padding: 0.5vh 0.5vw;
+    border: 0.05vw solid #ccc;
+    border-radius: 0.2vw;
+    font-size: 0.75vw;
+    box-sizing: border-box;
+    max-height: 10vh;
+    overflow-y: auto;
+    background-color: #fff;
+}
+
+.primary-key-label {
+    display: flex;
+    align-items: center;
+    font-size: 0.75vw;
+    color: #333;
+    gap: 0.25vw; /* Отступ между чекбоксом и текстом */
+}
+
+.primary-key-label input[type="checkbox"] {
+    width: 1vw;
+    height: 1vw;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 0.5vw;
+    margin-top: 1vh;
+}
+
+.modal-save-btn {
+    flex: 1;
+    padding: 0.75vh;
+    border: none;
+    border-radius: 0.2vw;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    font-size: 0.75vw;
+    transition: background-color 0.2s;
+}
+
+.modal-save-btn:hover {
+    background-color: #45a049;
+}
+
+.modal-cancel-btn {
+    flex: 1;
+    padding: 0.75vh;
+    border: 0.05vw solid #ccc;
+    border-radius: 0.2vw;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 0.75vw;
+    transition: background-color 0.2s;
+}
+
+.modal-cancel-btn:hover {
+    background-color: #e9ecef;
+}

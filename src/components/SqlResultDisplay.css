@@ -1,3 +1,5 @@
+/*/components/SqlResultDisplay.css*/
+
 .table-display-container {
     width: 100%;
     max-width: 70vw;
@@ -40,7 +42,7 @@
 
 .table-display-container h2 {
     margin: 0 0 1vh;
-    font-size: 1.25vw; /* Устанавливаем размер шрифта для заголовка */
+    font-size: 1.25vw;
     color: #333;
     text-align: center;
 }
@@ -58,6 +60,29 @@
     color: #155724;
 }
 
+.notification.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.table-action-buttons {
+    margin-bottom: 1vh;
+}
+
+.export-excel-btn {
+    padding: 0.75vh 1vw;
+    border: none;
+    border-radius: 0.2vw;
+    background-color: #ffffff;
+    color: #000000;
+    cursor: pointer;
+    font-size: 0.75vw;
+    transition: background-color 0.2s;
+}
+
+.export-excel-btn:hover {
+    background-color: #ffffff;
+}
 .notification.error {
     background-color: #f8d7da;
     color: #721c24;

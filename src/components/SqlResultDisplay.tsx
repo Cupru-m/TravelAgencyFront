@@ -18,6 +18,44 @@ interface SqlResultDisplayProps {
 }
 
 const SqlResultDisplay: React.FC<SqlResultDisplayProps> = ({ rows, columns, notification }) => {
+    const handleExportToExcel = async () => {
+        try {
+            const tableData = {
+                columns: columns.map(col => ({ name: col.name, type: col.type })),
+                rows: rows.map(row => {
+                    const rowData: any = {};
+                    columns.forEach(col => {
+                        rowData[col.name] = row[col.name] ?? 'NULL';
+                    });
+                    return rowData;
+                })
+            };
+
+            const response = await fetch('/api/database/export-to-excel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(tableData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка при экспорте: ' + response.status);
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sql_result_export.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Ошибка экспорта:', error);
+            alert('Не удалось экспортировать таблицу');
+        }
+    };
+
     return (
         <div className="table-display-container">
             <h2>Результат SQL запроса</h2>
@@ -26,6 +64,11 @@ const SqlResultDisplay: React.FC<SqlResultDisplayProps> = ({ rows, columns, noti
                     {notification.message}
                 </div>
             )}
+            <div className="table-action-buttons">
+                <button className="export-excel-btn" onClick={handleExportToExcel}>
+                    Экспорт в Excel
+                </button>
+            </div>
             <table className="table-display">
                 <thead>
                 <tr>

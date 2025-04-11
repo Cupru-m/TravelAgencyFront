@@ -157,3 +157,17 @@
 .modal-cancel-btn:hover {
     background-color: #e9ecef;
 }
+.drop-table-btn {
+    padding: 0.75vh 1vw;
+    border: none;
+    border-radius: 0.2vw;
+    background-color: #dc3545; /* Красный цвет */
+    color: white;
+    cursor: pointer;
+    font-size: 0.75vw;
+    transition: background-color 0.2s;
+}
+
+.drop-table-btn:hover {
+    background-color: #c82333; /* Темнее красный */
+}

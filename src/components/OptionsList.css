@@ -1,9 +1,12 @@
+/* components/OptionsList.css */
 .options-list {
     background-color: #f8f9fa;
     padding: 1.5vh;
     border-right: 0.05vw solid #dee2e6;
     box-sizing: border-box;
     position: relative;
+    height: 100vh;
+    overflow-y: auto;
 }
 
 .options-list h3 {
@@ -34,10 +37,21 @@
     font-size: 0.875vw;
     font-weight: 500;
     transition: background-color 0.2s ease;
+    border: none;
+    width: 100%;
+    text-align: left;
 }
 
 .tree-item-header:hover {
     background-color: #0056b3;
+}
+
+.tree-item-header.add-table-btn {
+    background-color: #4CAF50; /* Зелёный цвет для "Добавить таблицу" */
+}
+
+.tree-item-header.add-table-btn:hover {
+    background-color: #45a049; /* Темнее зелёный при наведении */
 }
 
 .tree-toggle {
@@ -61,7 +75,8 @@
     font-size: 0.875vw;
     color: #343a40;
     transition: background-color 0.2s ease;
-    cursor: pointer; /* Добавляем указатель, что элемент кликабелен */
+    cursor: pointer;
+    margin-bottom: 0.5vh;
 }
 
 .tree-child-item:hover {
@@ -69,7 +84,7 @@
 }
 
 .tree-child-item.selected {
-    background-color: #cce5ff; /* Светло-синий фон для выбранной таблицы */
+    background-color: #cce5ff;
     color: #007bff;
     font-weight: bold;
 }

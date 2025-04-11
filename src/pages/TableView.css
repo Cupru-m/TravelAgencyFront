@@ -49,3 +49,18 @@
 .table-content h2 {
     margin-bottom: 1vh;
 }
+.table-view-wrapper {
+    background-image: url('D:/Studies/3 term/TravelAgencyFront/adadmin/public/frutiger-eco-2.webp'); /* Укажите путь к изображению */
+    background-size: cover; /* Изображение растягивается на весь контейнер */
+    background-position: center; /* Центрирование изображения */
+    background-repeat: no-repeat; /* Изображение не повторяется */
+    min-height: 100vh; /* Высота контейнера на весь экран */
+    padding: 20px; /* Внутренние отступы для контента */
+}
+
+/* Дополнительно: чтобы контент оставался читаемым на фоне изображения */
+.table-content {
+    background-color: rgba(255, 255, 255, 0.8); /* Полупрозрачный белый фон */
+    padding: 20px;
+    border-radius: 8px;
+}

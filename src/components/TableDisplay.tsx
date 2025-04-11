@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import TableRow from './TableRow';
-import { addRow, deleteRow, updateRow, fetchTableRows } from '../api/api'; // Убедись, что fetchTableRows импортирован
+import AddRowForm from './AddRowForm';
+import { deleteRow, updateRow, dropTable, fetchTableRows } from '../api/api';
 import './TableDisplay.css';
-import {normalizeKeys, normalizeKeysToSnakeCase} from "../utils/utils";
+import { normalizeKeys } from "../utils/utils";
+import { useNavigate } from 'react-router-dom';
 
 interface ColumnInfo {
     name: string;
@@ -24,7 +26,7 @@ const TableDisplay: React.FC<TableDisplayProps> = ({ rows: initialRows, columns,
     const [rows, setRows] = useState<any[]>(initialRows);
     const [notification, setNotification] = useState<Notification | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
-    const [newRow, setNewRow] = useState<{ [key: string]: string }>({}); // Явно типизируем newRow
+    const navigate = useNavigate();
 
     useEffect(() => {
         setRows(initialRows);
@@ -58,25 +60,77 @@ const TableDisplay: React.FC<TableDisplayProps> = ({ rows: initialRows, columns,
         }
     };
 
-    const handleAddRow = async () => {
+    const handleRowAdded = async () => {
         try {
-            await addRow(tableName, newRow);
-            const updatedRowsRaw = await fetchTableRows(tableName); // Получаем данные с сервера
+            const updatedRowsRaw = await fetchTableRows(tableName);
             const updatedRows = updatedRowsRaw.map(normalizeKeys);
             setRows(updatedRows);
-            setIsAddModalOpen(false);
-            setNewRow({});
             setNotification({ message: 'Строка успешно добавлена', type: 'success' });
             setTimeout(() => setNotification(null), 3000);
         } catch (error) {
-            console.error('Ошибка при добавлении строки:', error);
-            setNotification({ message: 'Не удалось добавить строку', type: 'error' });
+            console.error('Ошибка при обновлении таблицы после добавления строки:', error);
+            setNotification({ message: 'Не удалось обновить таблицу', type: 'error' });
             setTimeout(() => setNotification(null), 3000);
         }
     };
 
-    const handleInputChange = (columnName: string, value: string) => {
-        setNewRow((prev: { [key: string]: string }) => ({ ...prev, [columnName]: value }));
+    const handleDropTable = async () => {
+        if (window.confirm(`Вы уверены, что хотите удалить таблицу "${tableName}"?`)) {
+            try {
+                await dropTable(tableName);
+                setNotification({ message: 'Таблица успешно удалена', type: 'success' });
+                setTimeout(() => {
+                    setNotification(null);
+                    navigate('/');
+                }, 2000);
+            } catch (error) {
+                console.error('Ошибка при удалении таблицы:', error);
+                setNotification({ message: 'Не удалось удалить таблицу', type: 'error' });
+                setTimeout(() => setNotification(null), 3000);
+            }
+        }
+    };
+
+    const handleExportToExcel = async () => {
+        try {
+            const tableData = {
+                columns: columns.map(col => ({ name: col.name, type: col.type })),
+                rows: rows.map(row => {
+                    const rowData: any = {};
+                    columns.forEach(col => {
+                        rowData[col.name] = row[col.name] ?? 'NULL';
+                    });
+                    return rowData;
+                })
+            };
+
+            const response = await fetch('/api/database/export-to-excel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(tableData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка при экспорте: ' + response.status);
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${tableName}_export.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+
+            setNotification({ message: 'Экспорт в Excel успешен', type: 'success' });
+            setTimeout(() => setNotification(null), 3000);
+        } catch (error) {
+            console.error('Ошибка экспорта:', error);
+            setNotification({ message: 'Не удалось экспортировать таблицу', type: 'error' });
+            setTimeout(() => setNotification(null), 3000);
+        }
     };
 
     return (
@@ -86,9 +140,17 @@ const TableDisplay: React.FC<TableDisplayProps> = ({ rows: initialRows, columns,
                     {notification.message}
                 </div>
             )}
-            <button className="add-row-btn" onClick={() => setIsAddModalOpen(true)}>
-                Добавить строку
-            </button>
+            <div className="table-action-buttons">
+                <button className="add-row-btn" onClick={() => setIsAddModalOpen(true)}>
+                    Добавить строку
+                </button>
+                <button className="drop-table-btn" onClick={handleDropTable}>
+                    Удалить таблицу
+                </button>
+                <button className="export-excel-btn" onClick={handleExportToExcel}>
+                    Экспорт в Excel
+                </button>
+            </div>
             <table className="table-display">
                 <thead>
                 <tr>
@@ -123,33 +185,12 @@ const TableDisplay: React.FC<TableDisplayProps> = ({ rows: initialRows, columns,
             </table>
 
             {isAddModalOpen && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <h4>Добавление новой строки</h4>
-                        {columns.map((column) => (
-                            <div key={column.name} className="modal-field">
-                                <label>{column.name} ({column.type}):</label>
-                                <input
-                                    type="text"
-                                    value={newRow[column.name] || ''}
-                                    onChange={(e) => handleInputChange(column.name, e.target.value)}
-                                    placeholder={`Введите ${column.name}`}
-                                />
-                            </div>
-                        ))}
-                        <div className="modal-buttons">
-                            <button className="modal-save-btn" onClick={handleAddRow}>
-                                Сохранить
-                            </button>
-                            <button
-                                className="modal-cancel-btn"
-                                onClick={() => setIsAddModalOpen(false)}
-                            >
-                                Отмена
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <AddRowForm
+                    tableName={tableName}
+                    columns={columns}
+                    onClose={() => setIsAddModalOpen(false)}
+                    onRowAdded={handleRowAdded}
+                />
             )}
         </div>
     );

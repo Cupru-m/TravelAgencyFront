@@ -1,5 +1,7 @@
+// components/OptionsList.tsx
 import React, { useState, useEffect, useRef } from 'react';
-import {executeSqlTemplate, fetchDatabaseInfo, fetchSqlTemplates, SqlTemplate, TableData} from '../api/api';
+import { executeSqlTemplate, fetchDatabaseInfo, fetchSqlTemplates, SqlTemplate, TableData, backupDatabase, restoreDatabase } from '../api/api';
+import AddTableForm from './AddTableForm';
 import './OptionsList.css';
 
 interface OptionsListProps {
@@ -24,6 +26,7 @@ const OptionsList: React.FC<OptionsListProps> = ({ tableName, onQueryExecute, on
         { name: 'SQL шаблоны', children: [] },
     ]);
     const [width, setWidth] = useState<number>(15);
+    const [isAddTableModalOpen, setIsAddTableModalOpen] = useState<boolean>(false);
     const optionsListRef = useRef<HTMLDivElement>(null);
     const isResizing = useRef<boolean>(false);
 
@@ -92,27 +95,53 @@ const OptionsList: React.FC<OptionsListProps> = ({ tableName, onQueryExecute, on
         } else if (parent === 'SQL шаблоны') {
             try {
                 const tableData = await executeSqlTemplate(child, tableName);
-                onQueryExecute(tableData); // Передаём результат запроса в TableView
+                onQueryExecute(tableData);
             } catch (error) {
                 console.error('Ошибка при выполнении SQL-шаблона:', error);
             }
         }
     };
 
+    const handleAddTableClick = () => {
+        setIsAddTableModalOpen(true);
+    };
+
+    const handleBackupDatabase = async () => {
+        try {
+            await backupDatabase();
+            alert('Резервная копия успешно создана');
+            loadData();
+        } catch (error) {
+            console.error('Ошибка при создании резервной копии:', error);
+            alert('Не удалось создать резервную копию');
+        }
+    };
+
+    const handleRestoreDatabase = async () => {
+        if (window.confirm('Вы уверены, что хотите восстановить базу данных из резервной копии? Это перезапишет текущие данные.')) {
+            try {
+                await restoreDatabase();
+                alert('База данных успешно восстановлена');
+                loadData();
+                onTableSelect('');
+            } catch (error) {
+                console.error('Ошибка при восстановлении базы данных:', error);
+                alert('Не удалось восстановить базу данных');
+            }
+        }
+    };
+
+    const handleTableCreated = () => {
+        loadData();
+    };
+
     return (
-        <div
-            className="options-list"
-            ref={optionsListRef}
-            style={{ width: `${width}vw` }}
-        >
+        <div className="options-list" ref={optionsListRef} style={{ width: `${width}vw` }}>
             <h3>Операции</h3>
             <ul className="tree-view">
                 {treeData.map((item) => (
                     <li key={item.name} className="tree-item">
-                        <div
-                            className="tree-item-header"
-                            onClick={() => toggleItem(item.name)}
-                        >
+                        <div className="tree-item-header" onClick={() => toggleItem(item.name)}>
                             <span className="tree-toggle">
                                 {expandedItems[item.name.toLowerCase()] ? '▼' : '▶'}
                             </span>
@@ -133,12 +162,38 @@ const OptionsList: React.FC<OptionsListProps> = ({ tableName, onQueryExecute, on
                                 ) : (
                                     <li className="tree-child-item">Нет данных</li>
                                 )}
+                                {item.name === 'Таблицы' && (
+                                    <li className="tree-item">
+                                        <button
+                                            className="tree-item-header add-table-btn"
+                                            onClick={handleAddTableClick}
+                                        >
+                                            Добавить таблицу
+                                        </button>
+                                    </li>
+                                )}
                             </ul>
                         )}
                     </li>
                 ))}
+                <li className="tree-item">
+                    <button className="tree-item-header" onClick={handleBackupDatabase}>
+                        Сделать бэкап
+                    </button>
+                </li>
+                <li className="tree-item">
+                    <button className="tree-item-header" onClick={handleRestoreDatabase}>
+                        Загрузить бэкап
+                    </button>
+                </li>
             </ul>
             <div className="resize-handle" onMouseDown={startResizing} />
+            {isAddTableModalOpen && (
+                <AddTableForm
+                    onClose={() => setIsAddTableModalOpen(false)}
+                    onTableCreated={handleTableCreated}
+                />
+            )}
         </div>
     );
 };

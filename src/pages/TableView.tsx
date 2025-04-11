@@ -1,3 +1,4 @@
+// components/tableView.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import TableDisplay from '../components/TableDisplay';
@@ -39,8 +40,9 @@ const TableView: React.FC = () => {
     const [rows, setRows] = useState<any[]>([]);
     const [refreshTemplates, setRefreshTemplates] = useState<number>(0);
     const [sqlResult, setSqlResult] = useState<TableData | null>(null);
-    const [notification, setNotification] = useState<Notification | null>(null); // Состояние для уведомлений
+    const [notification, setNotification] = useState<Notification | null>(null);
     const [showSqlResult, setShowSqlResult] = useState<boolean>(false);
+
     const fetchTableData = async (name: string) => {
         try {
             if (!name) {
@@ -54,7 +56,7 @@ const TableView: React.FC = () => {
             const normalizedRows = rowsData.map(normalizeKeys);
             setRows(normalizedRows);
             setSqlResult(null);
-            setNotification(null); // Сбрасываем уведомление при выборе таблицы
+            setNotification(null);
         } catch (error) {
             console.error('Ошибка:', error);
             setColumns([]);
@@ -84,9 +86,11 @@ const TableView: React.FC = () => {
     const handleTemplateSaved = () => {
         setRefreshTemplates((prev) => prev + 1);
     };
+
     const handleShowSqlResult = (show: boolean) => {
         setShowSqlResult(show);
     };
+
     return (
         <div className="table-view-wrapper">
             <OptionsList
@@ -101,14 +105,16 @@ const TableView: React.FC = () => {
                     <SqlResultDisplay
                         rows={sqlResult.rows}
                         columns={sqlResult.columns}
-                        notification={notification} // Передаём уведомление
+                        notification={notification}
                     />
                 ) : (
                     <TableDisplay rows={rows} columns={columns} tableName={tableName} />
                 )}
-                <SqlQueryInput   onTemplateSaved={handleTemplateSaved}
-                               onQueryResult={handleQueryExecute}
-                               onShowResult={handleShowSqlResult}/>
+                <SqlQueryInput
+                    onTemplateSaved={handleTemplateSaved}
+                    onQueryResult={handleQueryExecute}
+                    onShowResult={handleShowSqlResult}
+                />
             </div>
         </div>
     );

@@ -10,7 +10,7 @@ interface DatabaseInfo {
     tables: string[];
 }
 
-export interface SqlTemplate { // Переименован SqlOption в SqlTemplate
+export interface SqlTemplate {
     name: string;
     query: string;
 }
@@ -21,8 +21,9 @@ export interface TableData {
 }
 
 const BASE_URL = '';
+
 export const executeSqlTemplate = async (templateName: string, tableName: string): Promise<TableData> => {
-    const response = await fetch('/api/execute-sql-template', {
+    const response = await fetch('/api/database/execute-sql-template', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -38,8 +39,7 @@ export const executeSqlTemplate = async (templateName: string, tableName: string
 };
 
 export const addRow = async (tableName: string, rowData: any): Promise<void> => {
-    rowData = normalizeKeysToCamelCase(rowData);
-    const response = await fetch(`/api/${tableName.toLowerCase()}`, {
+    const response = await fetch(`/api/tables/${tableName}/rows`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export const addRow = async (tableName: string, rowData: any): Promise<void> => 
 };
 
 export const fetchDatabaseInfo = async (): Promise<DatabaseInfo> => {
-    const response = await fetch(`${BASE_URL}/api/database-info`);
+    const response = await fetch(`${BASE_URL}/api/database/info`);
     if (!response.ok) {
         throw new Error('Ошибка при загрузке информации о базе данных');
     }
@@ -61,7 +61,7 @@ export const fetchDatabaseInfo = async (): Promise<DatabaseInfo> => {
 };
 
 export const fetchTableColumns = async (tableName: string): Promise<ColumnInfo[]> => {
-    const response = await fetch(`${BASE_URL}/api/${tableName.toLowerCase()}/columns`);
+    const response = await fetch(`${BASE_URL}/api/tables/${tableName}/columns`);
     if (!response.ok) {
         throw new Error(`Ошибка при загрузке столбцов для таблицы ${tableName}`);
     }
@@ -69,24 +69,23 @@ export const fetchTableColumns = async (tableName: string): Promise<ColumnInfo[]
 };
 
 export const fetchTableRows = async (tableName: string): Promise<any[]> => {
-    const response = await fetch(`${BASE_URL}/api/${tableName.toLowerCase()}`);
+    const response = await fetch(`${BASE_URL}/api/tables/${tableName}/rows`);
     if (!response.ok) {
         throw new Error(`Ошибка при загрузке строк для таблицы ${tableName}`);
     }
     return response.json();
 };
 
-export const fetchSqlTemplates = async (): Promise<SqlTemplate[]> => { // Переименован fetchSqlOptions
-    const response = await fetch('/api/sql-options');
+export const fetchSqlTemplates = async (): Promise<SqlTemplate[]> => {
+    const response = await fetch('/api/database/sql-options');
     if (!response.ok) {
         throw new Error('Ошибка при загрузке SQL-запросов');
     }
     return response.json();
 };
 
-
-export const saveSqlTemplate = async (template: SqlTemplate): Promise<void> => { // Новая функция для сохранения шаблона
-    const response = await fetch('/api/sql-options', {
+export const saveSqlTemplate = async (template: SqlTemplate): Promise<void> => {
+    const response = await fetch('/api/database/sql-options', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -100,8 +99,8 @@ export const saveSqlTemplate = async (template: SqlTemplate): Promise<void> => {
 };
 
 export const updateRow = async (tableName: string, id: string, updatedRow: any): Promise<void> => {
-    updatedRow = normalizeKeysToCamelCase(updatedRow);
-    const response = await fetch(`/api/${tableName}/${id}`, {
+
+    const response = await fetch(`/api/tables/${tableName}/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -115,7 +114,7 @@ export const updateRow = async (tableName: string, id: string, updatedRow: any):
 };
 
 export const deleteRow = async (tableName: string, id: string): Promise<void> => {
-    const response = await fetch(`/api/${tableName}/${id}`, {
+    const response = await fetch(`/api/tables/${tableName}/${id}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -126,23 +125,9 @@ export const deleteRow = async (tableName: string, id: string): Promise<void> =>
         throw new Error('Не удалось удалить строку');
     }
 };
-export const executeSqlQuery = async (sqlQuery: string, tableName: string): Promise<TableData> => {
-    const response = await fetch('/api/execute-sql', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query: sqlQuery, tableName }),
-    });
 
-    if (!response.ok) {
-        throw new Error('Ошибка при выполнении SQL-запроса');
-    }
-
-    return response.json();
-};
 export const executeSqlQuerySimple = async (sqlQuery: string): Promise<TableData> => {
-    const response = await fetch('/api/execute-sql-simple', {
+    const response = await fetch('/api/database/execute-sql-simple', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -155,4 +140,51 @@ export const executeSqlQuerySimple = async (sqlQuery: string): Promise<TableData
     }
 
     return response.json();
+};
+
+
+export const createTable = async (tableName: string, columns: { name: string; type: string; isPrimaryKey: boolean }[]) => {
+    const response = await fetch('/api/tables', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tableName, columns }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to create table');
+    }
+    return response.json();
+};
+
+export const dropTable = async (tableName: string): Promise<void> => {
+    const response = await fetch(`/api/tables/${tableName}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Ошибка при удалении таблицы');
+    }
+};
+export const backupDatabase = async () => {
+    const response = await fetch('/api/database/backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) {
+        throw new Error('Failed to create database backup');
+    }
+    return response.json(); // Ожидаем { "message": "..." }
+};
+
+export const restoreDatabase = async () => {
+    const response = await fetch('/api/database/restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) {
+        throw new Error('Failed to restore database');
+    }
+    return response.json(); // Ожидаем { "message": "..." }
 };
